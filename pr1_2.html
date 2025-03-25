@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Калькулятор мазуту</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Перерахунок складу мазуту на робочу масу</h2>
+    <form id="fuelForm">
+        <table>
+            <tr><th>Параметр</th><th>Значення</th></tr>
+            <tr><td>Вуглець (C<sup>r</sup>), %</td><td><input type="number" step="0.1" name="C" required></td></tr>
+            <tr><td>Водень (H<sup>r</sup>), %</td><td><input type="number" step="0.1" name="H" required></td></tr>
+            <tr><td>Кисень (O<sup>r</sup>), %</td><td><input type="number" step="0.1" name="O" required></td></tr>
+            <tr><td>Сірка (S<sup>r</sup>), %</td><td><input type="number" step="0.1" name="S" required></td></tr>
+            <tr><td>Теплота згоряння (Q<sup>r</sup>), МДж/кг</td><td><input type="number" step="0.1" name="Qr" required></td></tr>
+            <tr><td>Вологість (W<sup>P</sup>), %</td><td><input type="number" step="0.1" name="W" required></td></tr>
+            <tr><td>Зольність сухої маси (A<sup>c</sup>), %</td><td><input type="number" step="0.01" name="Ac" required></td></tr>
+            <tr><td>Ванадій (V<sup>r</sup>), мг/кг</td><td><input type="number" step="0.1" name="V" required></td></tr>
+        </table>
+        <button type="button" onclick="calculate()">Розрахувати</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        function calculate() {
+            const C = parseFloat(document.querySelector('input[name="C"]').value);
+            const H = parseFloat(document.querySelector('input[name="H"]').value);
+            const O = parseFloat(document.querySelector('input[name="O"]').value);
+            const S = parseFloat(document.querySelector('input[name="S"]').value);
+            const Qr = parseFloat(document.querySelector('input[name="Qr"]').value);
+            const W = parseFloat(document.querySelector('input[name="W"]').value);
+            const Ac = parseFloat(document.querySelector('input[name="Ac"]').value);
+            const V = parseFloat(document.querySelector('input[name="V"]').value);
+
+            // Коефіцієнт переходу до робочої маси
+            const K = (100 - W - Ac) / 100;
+
+            // Склад робочої маси
+            const Cp = (C * K).toFixed(2);
+            const Hp = (H * K).toFixed(2);
+            const Op = (O * K).toFixed(2);
+            const Sp = (S * K).toFixed(2);
+            const Ap = (Ac * (100 - W) / 100).toFixed(2);
+            const Vp = (V * (100 - W) / 100).toFixed(2);
+
+            // Теплота згоряння робочої маси
+            const Qp = (Qr * K - 0.025 * W).toFixed(4);
+
+            // Вивід результатів
+            document.getElementById("results").innerHTML = `
+                <h3>Результати:</h3>
+                <p>1. Склад робочої маси:</p>
+                <ul>
+                    <li>Вуглець (C<sup>P</sup>): ${Cp}%</li>
+                    <li>Водень (H<sup>P</sup>): ${Hp}%</li>
+                    <li>Кисень (O<sup>P</sup>): ${Op}%</li>
+                    <li>Сірка (S<sup>P</sup>): ${Sp}%</li>
+                    <li>Зола (A<sup>P</sup>): ${Ap}%</li>
+                    <li>Ванадій (V<sup>P</sup>): ${Vp} мг/кг</li>
+                </ul>
+                <p>2. Нижча теплота згоряння (Q<sup>P</sup>): ${Qp} МДж/кг</p>
+            `;
+        }
+    </script>
+</body>
+</html>

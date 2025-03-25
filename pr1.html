@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Калькулятор палива</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Розрахунок параметрів палива</h2>
+    <form id="fuelForm">
+        <table>
+            <tr><th>Компонент</th><th>Значення, %</th></tr>
+            <tr><td>Водень (H<sup>P</sup>)</td><td><input type="number" step="0.1" name="H" required></td></tr>
+            <tr><td>Вуглець (C<sup>P</sup>)</td><td><input type="number" step="0.1" name="C" required></td></tr>
+            <tr><td>Сірка (S<sup>P</sup>)</td><td><input type="number" step="0.1" name="S" required></td></tr>
+            <tr><td>Азот (N<sup>P</sup>)</td><td><input type="number" step="0.1" name="N" required></td></tr>
+            <tr><td>Кисень (O<sup>P</sup>)</td><td><input type="number" step="0.1" name="O" required></td></tr>
+            <tr><td>Вологість (W<sup>P</sup>)</td><td><input type="number" step="0.1" name="W" required></td></tr>
+            <tr><td>Зола (A<sup>P</sup>)</td><td><input type="number" step="0.1" name="A" required></td></tr>
+        </table>
+        <button type="button" onclick="calculate()">Розрахувати</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        function calculate() {
+            const H = parseFloat(document.querySelector('input[name="H"]').value);
+            const C = parseFloat(document.querySelector('input[name="C"]').value);
+            const S = parseFloat(document.querySelector('input[name="S"]').value);
+            const N = parseFloat(document.querySelector('input[name="N"]').value);
+            const O = parseFloat(document.querySelector('input[name="O"]').value);
+            const W = parseFloat(document.querySelector('input[name="W"]').value);
+            const A = parseFloat(document.querySelector('input[name="A"]').value);
+
+            // Коефіцієнти переходу
+            const Kc = 100 / (100 - W);
+            const Kr = 100 / (100 - W - A);
+
+            // Склад сухої маси
+            const Hc = (H * Kc).toFixed(2);
+            const Cc = (C * Kc).toFixed(2);
+            const Sc = (S * Kc).toFixed(2);
+            const Nc = (N * Kc).toFixed(3);
+            const Oc = (O * Kc).toFixed(2);
+            const Ac = (A * Kc).toFixed(2);
+
+            // Склад горючої маси
+            const Hr = (H * Kr).toFixed(2);
+            const Cr = (C * Kr).toFixed(2);
+            const Sr = (S * Kr).toFixed(2);
+            const Nr = (N * Kr).toFixed(3);
+            const Or = (O * Kr).toFixed(2);
+
+            // Теплота згоряння
+            const Qp = (0.339*C + 1.025*H + 0.1085*S - 0.1085*O - 0.025*W).toFixed(4);
+            const Qc = (0.339*Cc + 1.025*Hc + 0.1085*Sc - 0.1085*Oc).toFixed(2);
+            const Qr = (0.339*Cr + 1.025*Hr + 0.1085*Sr - 0.1085*Or).toFixed(2);
+
+            // Вивід результатів
+            document.getElementById("results").innerHTML = `
+                <h3>Результати:</h3>
+                <p>1. Коефіцієнт до сухої маси (K<sub>c</sub>): ${Kc.toFixed(2)}</p>
+                <p>2. Коефіцієнт до горючої маси (K<sub>r</sub>): ${Kr.toFixed(2)}</p>
+                <p>3. Склад сухої маси: H<sup>c</sup>=${Hc}%, C<sup>c</sup>=${Cc}%, S<sup>c</sup>=${Sc}%, N<sup>c</sup>=${Nc}%, O<sup>c</sup>=${Oc}%, A<sup>c</sup>=${Ac}%</p>
+                <p>4. Склад горючої маси: H<sup>r</sup>=${Hr}%, C<sup>r</sup>=${Cr}%, S<sup>r</sup>=${Sr}%, N<sup>r</sup>=${Nr}%, O<sup>r</sup>=${Or}%</p>
+                <p>5. Q<sup>P</sup> = ${Qp} МДж/кг; Q<sup>c</sup> = ${Qc} МДж/кг; Q<sup>r</sup> = ${Qr} МДж/кг</p>
+            `;
+        }
+    </script>
+</body>
+</html>
